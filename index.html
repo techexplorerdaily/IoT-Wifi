@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 WiFi Settings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>ESP32 WiFi Settings</h2>
+        <form id="wifiForm">
+            <label for="ssid">WiFi SSID:</label>
+            <input type="text" id="ssid" name="ssid" required>
+
+            <label for="password">WiFi Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="button" onclick="updateFirebase()">Update</button>
+        </form>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        async function updateFirebase() {
+            const ssid = document.getElementById('ssid').value;
+            const password = document.getElementById('password').value;
+
+            if (!ssid || !password) {
+                document.getElementById('message').textContent = "Please fill in all fields.";
+                return;
+            }
+
+            const firebaseUrl = 'https://esp32-4dee4-default-rtdb.firebaseio.com/esp/wifi.json';
+
+            try {
+                const response = await fetch(firebaseUrl, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        SSID: ssid,
+                        PASSWORD: password
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('message').textContent = "WiFi settings updated successfully.";
+                } else {
+                    document.getElementById('message').textContent = "Failed to update WiFi settings.";
+                }
+            } catch (error) {
+                document.getElementById('message').textContent = "An error occurred: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
